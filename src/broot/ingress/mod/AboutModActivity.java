@@ -39,13 +39,6 @@ public class AboutModActivity extends BaseSubActivity {
                 menuItemsTable.top().pad(10);
 
                 gameplayTweaksItem = new ListItem(skin, "Gameplay tweaks", null);
-                gameplayTweaksItem.addButton("Deployment type", "", new ClickListener() {
-                    @Override
-                    public void clicked(InputEvent event, float x, float y) {
-                        Config.nextDeployBehavior();
-                        updateGameplayTweaksValues(true);
-                    }
-                });
                 gameplayTweaksItem.addButton("TARGET and FIRE", "", new ClickListener() {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
@@ -63,10 +56,24 @@ public class AboutModActivity extends BaseSubActivity {
                         updateTabsValues(false);
                     }
                 });
-                tabsItem.addButton("ITEMS", "Show", new ClickListener() {
+                tabsItem.addButton("INVENTORY", "Show", new ClickListener() {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
                         Config.showOrigItemsTab = !Config.showOrigItemsTab;
+                        updateTabsValues(true);
+                    }
+                });
+                tabsItem.addButton("AGENT", "Show", new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        Config.showAgentTab = !Config.showAgentTab;
+                        updateTabsValues(true);
+                    }
+                });
+                tabsItem.addButton("MISSIONS", "Show", new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        Config.showMissionTab = !Config.showMissionTab;
                         updateTabsValues(true);
                     }
                 });
@@ -77,17 +84,17 @@ public class AboutModActivity extends BaseSubActivity {
                         updateTabsValues(true);
                     }
                 });
-                tabsItem.addButton("MISSION", "Show", new ClickListener() {
-                    @Override
-                    public void clicked(InputEvent event, float x, float y) {
-                        Config.showMissionTab = !Config.showMissionTab;
-                        updateTabsValues(true);
-                    }
-                });
                 tabsItem.addButton("RECRUIT", "Show", new ClickListener() {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
                         Config.showRecruitTab = !Config.showRecruitTab;
+                        updateTabsValues(true);
+                    }
+                });
+                tabsItem.addButton("PASSCODE", "Show", new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        Config.showPasscodeTab = !Config.showPasscodeTab;
                         updateTabsValues(true);
                     }
                 });
@@ -115,10 +122,10 @@ public class AboutModActivity extends BaseSubActivity {
                         updateAnimsValues(true);
                     }
                 });
-                animsItem.addButton("Hacking type", "", new ClickListener() {
+                animsItem.addButton("Hacking", "", new ClickListener() {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
-                        Config.nextHackType();
+                        Config.hackAnimEnabled = !Config.hackAnimEnabled;
                         updateAnimsValues(true);
                     }
                 });
@@ -133,6 +140,20 @@ public class AboutModActivity extends BaseSubActivity {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
                         Config.recycleAnimationsEnabled = !Config.recycleAnimationsEnabled;
+                        updateAnimsValues(true);
+                    }
+                });
+                animsItem.addButton("XM flow", "", new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        Config.xmFlowEnabled = !Config.xmFlowEnabled;
+                        updateAnimsValues(true);
+                    }
+                });
+                animsItem.addButton("Shield Animation", "", new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        Config.shieldAnimEnabled = !Config.shieldAnimEnabled;
                         updateAnimsValues(true);
                     }
                 });
@@ -200,6 +221,36 @@ public class AboutModActivity extends BaseSubActivity {
                         Mod.updateKeepScreenOn();
                     }
                 });
+                uiTweaksItem.addButton("Keep GPS on", "", new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        Config.nextGpsLockTime();
+                        updateUiTweaksValues(true);
+                        Mod.updateKeepScreenOn();
+                    }
+                });
+                uiTweaksItem.addButton("Modify portal info", "", new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        Config.changePortalInfoDialog = !Config.changePortalInfoDialog;
+                        updateUiTweaksValues(true);
+                    }
+                });
+                uiTweaksItem.addButton("Allow Cubes recyling", "", new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        Config.enablePowerCubesRecycle = !Config.enablePowerCubesRecycle;
+                        updateUiTweaksValues(true);
+                    }
+                });
+                uiTweaksItem.addButton("Privacy", "", new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        Config.isPrivacyOn = !Config.isPrivacyOn;
+                        updateUiTweaksValues(true);
+                        restartItem.descLabel.setText("Restart is recommended");
+                    }
+                });
                 addItem(uiTweaksItem);
 
                 addItem(uiVariantItem = new ListItem(skin, "UI variant", "", "Toggle", new ClickListener() {
@@ -261,8 +312,7 @@ public class AboutModActivity extends BaseSubActivity {
         if (save) {
             Config.save();
         }
-        gameplayTweaksItem.buttons.get(0).setText(Config.deployBehavior.desc);
-        gameplayTweaksItem.buttons.get(1).setText(Config.swapTouchMenuButtons ? "Swap" : "Leave");
+        gameplayTweaksItem.buttons.get(0).setText(Config.swapTouchMenuButtons ? "Swap" : "Leave");
     }
 
     private void updateTabsValues(boolean save) {
@@ -271,10 +321,12 @@ public class AboutModActivity extends BaseSubActivity {
         }
         tabsItem.buttons.get(0).setText(Config.itemsTab.desc);
         tabsItem.buttons.get(1).setText(Config.showOrigItemsTab ? "Show" : "Hide");
-        tabsItem.buttons.get(2).setText(Config.showIntelTab ? "Show" : "Hide");
+        tabsItem.buttons.get(2).setText(Config.showAgentTab ? "Show" : "Hide");
         tabsItem.buttons.get(3).setText(Config.showMissionTab ? "Show" : "Hide");
-        tabsItem.buttons.get(4).setText(Config.showRecruitTab ? "Show" : "Hide");
-        tabsItem.buttons.get(5).setText(Config.showDeviceTab ? "Show" : "Hide");
+        tabsItem.buttons.get(4).setText(Config.showIntelTab ? "Show" : "Hide");
+        tabsItem.buttons.get(5).setText(Config.showRecruitTab ? "Show" : "Hide");
+        tabsItem.buttons.get(6).setText(Config.showPasscodeTab ? "Show" : "Hide");
+        tabsItem.buttons.get(7).setText(Config.showDeviceTab ? "Show" : "Hide");
         topWidget.createTabs();
     }
 
@@ -284,13 +336,15 @@ public class AboutModActivity extends BaseSubActivity {
         }
 //        animsItem.buttons.get(0).setText(!Config.skipIntro ? "ON" : "OFF");
         animsItem.buttons.get(0).setText(Config.scannerZoomInAnimEnabled ? "ON" : "OFF");
-        animsItem.buttons.get(1).setText(Config.hackType.desc);
+        animsItem.buttons.get(1).setText(Config.hackAnimEnabled ? "ON" : "OFF");
         animsItem.buttons.get(2).setText(Config.rotateInventoryItemsEnabled ? "ON" : "OFF");
         animsItem.buttons.get(3).setText(Config.recycleAnimationsEnabled ? "ON" : "OFF");
+        animsItem.buttons.get(4).setText(Config.xmFlowEnabled ? "ON" : "OFF");
+        animsItem.buttons.get(5).setText(Config.shieldAnimEnabled ? "ON" : "OFF");
     }
 
     private void updateUiTweaksValues(boolean save) {
-        String timeFormatLabel;
+        String timeFormatLabel, gpsLockLabel;
         if (save) {
             Config.save();
         }
@@ -307,6 +361,20 @@ public class AboutModActivity extends BaseSubActivity {
         uiTweaksItem.buttons.get(5).setText(timeFormatLabel);
         uiTweaksItem.buttons.get(6).setText(Config.vibration ? "ON" : "OFF");
         uiTweaksItem.buttons.get(7).setText(Config.keepScreenOn ? "ON" : "OFF");
+        switch (Config.gpsLockTime) {
+            case 0: gpsLockLabel = "Disabled"; break;
+            case 30000: gpsLockLabel = "30sec"; break;
+            case 60000: gpsLockLabel = "1min"; break;
+            case 120000: gpsLockLabel = "2min"; break;
+            case 300000: gpsLockLabel = "5min"; break;
+            case 600000: gpsLockLabel = "10min"; break;
+            case 900000: gpsLockLabel = "15min"; break;
+            default: gpsLockLabel = "Unknown";
+        }
+        uiTweaksItem.buttons.get(8).setText(gpsLockLabel);
+        uiTweaksItem.buttons.get(9).setText(Config.changePortalInfoDialog ? "ON" : "OFF");
+        uiTweaksItem.buttons.get(10).setText(Config.enablePowerCubesRecycle ? "ON" : "OFF");
+        uiTweaksItem.buttons.get(11).setText(Config.isPrivacyOn ? "ON" : "OFF");
     }
 
     private void updateUiVariantValue() {

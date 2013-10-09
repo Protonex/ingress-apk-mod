@@ -7,21 +7,24 @@ import java.util.List;
 
 public class Config {
 
-    public static DeployBehavior deployBehavior;
     public static boolean swapTouchMenuButtons;
 
     public static ItemsTab itemsTab;
     public static boolean showOrigItemsTab;
+    public static boolean showAgentTab;
     public static boolean showIntelTab;
     public static boolean showMissionTab;
     public static boolean showRecruitTab;
+    public static boolean showPasscodeTab;
     public static boolean showDeviceTab;
 
     public static boolean skipIntro;
     public static boolean scannerZoomInAnimEnabled;
-    public static HackType hackType;
+    public static boolean hackAnimEnabled;
     public static boolean rotateInventoryItemsEnabled;
     public static boolean recycleAnimationsEnabled;
+    public static boolean xmFlowEnabled;
+    public static boolean shieldAnimEnabled;
 
     public static boolean fullscreen;
     public static boolean showPortalVectors;
@@ -30,29 +33,36 @@ public class Config {
     public static boolean scannerObjectsEnabled;
     public static boolean simplifyInventoryItems;
     public static int chatTimeFormat;
+    public static int gpsLockTime;
     public static boolean vibration;
     public static boolean keepScreenOn;
+    public static boolean changePortalInfoDialog;
+    public static boolean enablePowerCubesRecycle;
+    public static boolean isPrivacyOn;
 
     public static UiVariant uiVariant;
 
     public static void load() {
         SharedPreferences prefs = Mod.app.getSharedPreferences("mod", 0);
 
-        deployBehavior = DeployBehavior.valueOf(prefs.getString("deployBehavior", "MANUAL"));
         swapTouchMenuButtons = prefs.getBoolean("swapTouchMenuButtons", false);
 
         itemsTab = ItemsTab.valueOf(prefs.getString("itemsTab", "HIDDEN"));
         showOrigItemsTab = prefs.getBoolean("showOrigItemsTab", true);
+        showAgentTab = prefs.getBoolean("showAgentTab", true);
         showIntelTab = prefs.getBoolean("showIntelTab", true);
         showMissionTab = prefs.getBoolean("showMissionTab", true);
         showRecruitTab = prefs.getBoolean("showRecruitTab", true);
+        showPasscodeTab = prefs.getBoolean("showPasscodeTab", true);
         showDeviceTab = prefs.getBoolean("showDeviceTab", true);
 
         skipIntro = prefs.getBoolean("skipIntro", false);
         scannerZoomInAnimEnabled = prefs.getBoolean("scannerZoomInAnimEnabled", true);
-        hackType = HackType.valueOf(prefs.getString("hackType", "ANIMATED"));
+        hackAnimEnabled = prefs.getBoolean("hackAnimEnabled", true);
         rotateInventoryItemsEnabled = prefs.getBoolean("rotateInventoryItemsEnabled", true);
         recycleAnimationsEnabled = prefs.getBoolean("recycleAnimationsEnabled", true);
+        xmFlowEnabled = prefs.getBoolean("xmFlowEnabled", true);
+        shieldAnimEnabled = prefs.getBoolean("shieldAnimEnabled", true);
 
         fullscreen = prefs.getBoolean("fullscreen", false);
         showPortalVectors = prefs.getBoolean("showPortalVectors", true);
@@ -60,9 +70,13 @@ public class Config {
         xmGlobsEnabled = prefs.getBoolean("xmGlobsEnabled", true);
         scannerObjectsEnabled = prefs.getBoolean("scannerObjectsEnabled", true);
         simplifyInventoryItems = prefs.getBoolean("simplifyInventoryItems", false);
+        gpsLockTime = prefs.getInt("gpsLockTime", 120000);
         chatTimeFormat = prefs.getInt("chatTimeFormat", 0);
         vibration = prefs.getBoolean("vibration", true);
         keepScreenOn = prefs.getBoolean("keepScreenOn", false);
+        changePortalInfoDialog = prefs.getBoolean("changePortalInfoDialog", false);
+        enablePowerCubesRecycle = prefs.getBoolean("enablePowerCubesRecycle", true);
+        isPrivacyOn = prefs.getBoolean("isPrivacyOn", false);
 
         uiVariant = UiVariant.byName.get(prefs.getString("uiVariant", "auto"));
         if (uiVariant == null) {
@@ -75,21 +89,24 @@ public class Config {
     public static void save() {
         SharedPreferences.Editor e = Mod.app.getSharedPreferences("mod", 0).edit();
 
-        e.putString("deployBehavior", deployBehavior.toString());
         e.putBoolean("swapTouchMenuButtons", swapTouchMenuButtons);
 
         e.putString("itemsTab", itemsTab.toString());
         e.putBoolean("showOrigItemsTab", showOrigItemsTab);
+        e.putBoolean("showAgentTab", showAgentTab);
         e.putBoolean("showIntelTab", showIntelTab);
         e.putBoolean("showMissionTab", showMissionTab);
         e.putBoolean("showRecruitTab", showRecruitTab);
+        e.putBoolean("showPasscodeTab", showPasscodeTab);
         e.putBoolean("showDeviceTab", showDeviceTab);
 
         e.putBoolean("skipIntro", skipIntro);
+        e.putBoolean("hackAnimEnabled", hackAnimEnabled);
         e.putBoolean("scannerZoomInAnimEnabled", scannerZoomInAnimEnabled);
-        e.putString("hackType", hackType.toString());
         e.putBoolean("rotateInventoryItemsEnabled", rotateInventoryItemsEnabled);
         e.putBoolean("recycleAnimationsEnabled", recycleAnimationsEnabled);
+        e.putBoolean("xmFlowEnabled", xmFlowEnabled);
+        e.putBoolean("shieldAnimEnabled", shieldAnimEnabled);
 
         e.putBoolean("fullscreen", fullscreen);
         e.putBoolean("showPortalVectors", showPortalVectors);
@@ -97,9 +114,13 @@ public class Config {
         e.putBoolean("xmGlobsEnabled", xmGlobsEnabled);
         e.putBoolean("scannerObjectsEnabled", scannerObjectsEnabled);
         e.putBoolean("simplifyInventoryItems", simplifyInventoryItems);
+        e.putInt("gpsLockTime", gpsLockTime);
         e.putInt("chatTimeFormat", chatTimeFormat);
         e.putBoolean("vibration", vibration);
         e.putBoolean("keepScreenOn", keepScreenOn);
+        e.putBoolean("changePortalInfoDialog", changePortalInfoDialog);
+        e.putBoolean("enablePowerCubesRecycle", enablePowerCubesRecycle);
+        e.putBoolean("isPrivacyOn", isPrivacyOn);
 
         e.putString("uiVariant", uiVariant.name);
 
@@ -111,20 +132,22 @@ public class Config {
         save();
     }
     
-    public static void nextDeployBehavior() {
-        deployBehavior = DeployBehavior.values()[(deployBehavior.ordinal() + 1) % DeployBehavior.values().length];
-        save();
-    }
-    
-    public static void nextHackType() {
-        hackType = HackType.values()[(hackType.ordinal() + 1) % HackType.values().length];
-        save();
-    }
-
     public static void nextUiVariant() {
         List<UiVariant> variants = UiVariant.variants;
         uiVariant = variants.get((variants.indexOf(uiVariant) + 1) % variants.size());
         save();
+    }
+
+    public static void nextGpsLockTime() {
+        switch (gpsLockTime) {
+            case 0: gpsLockTime = 30000; break;
+            case 30000: gpsLockTime = 60000; break;
+            case 60000: gpsLockTime = 120000; break;
+            case 120000: gpsLockTime = 300000; break;
+            case 300000: gpsLockTime = 600000; break;
+            case 600000: gpsLockTime = 900000; break;
+            case 900000: gpsLockTime = 0;
+        }
     }
 
     public static enum ItemsTab {
@@ -136,32 +159,6 @@ public class Config {
         public final String desc;
 
         private ItemsTab(String desc) {
-            this.desc = desc;
-        }
-    }
-    
-    public static enum DeployBehavior {
-        MANUAL("Manual"),
-        HIGHEST("Highest first"),
-        LOWEST("Lowest first"),
-        ;
-
-        public final String desc;
-
-        private DeployBehavior(String desc) {
-            this.desc = desc;
-        }
-    }
-    
-    public static enum HackType {
-        ANIMATED("Animated"),
-        FAST("Fast"),
-        SIMPLE("Simple"),
-        ;
-        
-        public final String desc;
-
-        private HackType(String desc) {
             this.desc = desc;
         }
     }

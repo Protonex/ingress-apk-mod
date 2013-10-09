@@ -8,6 +8,7 @@ import com.nianticproject.ingress.common.inventory.ItemsActivity;
 import com.nianticproject.ingress.common.playerprofile.MyProfileActivity;
 import com.nianticproject.ingress.common.mission.MissionListActivity;
 import com.nianticproject.ingress.common.recruit.RecruitActivity;
+import com.nianticproject.ingress.common.passcode.PasscodeTabActivity;
 import com.nianticproject.ingress.common.ui.widget.MenuTabId;
 
 import java.util.ArrayList;
@@ -23,17 +24,20 @@ public class MenuUtils {
         if (Config.showOrigItemsTab) {
             tabs.add(MenuTabId.INVENTORY);
         }
-
-        //tabs.add(MenuTabId.AGENT);
-
-        if (Config.showIntelTab) {
-            tabs.add(MenuTabId.INTEL);
+        if (Config.showAgentTab) {
+            tabs.add(MenuTabId.AGENT);
         }
         if (Config.showMissionTab) {
             tabs.add(MenuTabId.MISSIONS);
         }
+        if (Config.showIntelTab) {
+            tabs.add(MenuTabId.INTEL);
+        }
         if (Config.showRecruitTab) {
             tabs.add(MenuTabId.RECRUIT);
+        }
+        if (Config.showPasscodeTab) {
+            tabs.add(MenuTabId.PASSCODE);
         }
         if (Config.showDeviceTab) {
             tabs.add(MenuTabId.DEVICE);
@@ -49,20 +53,22 @@ public class MenuUtils {
         switch (tab) {
             case MOD_ITEMS:
                 return ModItemsActivity.class;
-            case MOD_ABOUT:
-                return AboutModActivity.class;
             case INVENTORY:
                 return ItemsActivity.class;
             case AGENT:
                 return MyProfileActivity.class;
-            case INTEL:
-                return IntelActivity.class;
             case MISSIONS:
                 return MissionListActivity.class;
+            case INTEL:
+                return IntelActivity.class;
             case RECRUIT:
                 return RecruitActivity.class;
+            case PASSCODE:
+                return PasscodeTabActivity.class;
             case DEVICE:
                 return DeviceActivity.class;
+            case MOD_ABOUT:
+                return AboutModActivity.class;
             default:
                 throw new RuntimeException();
         }

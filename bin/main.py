@@ -47,7 +47,6 @@ def main():
 
     edit = edit_cls('SubActivityManager')
     edit.mod_field_def('skin', 'public')
-
     edit.prepare_after_prologue('init')
     edit.add_invoke_entry('SubActivityManager_onInit', 'p2')
     edit.save()
@@ -62,7 +61,6 @@ def main():
     edit = edit_cls('MenuTabId')
     edit.add_enum('MOD_ABOUT')
     edit.add_enum('MOD_ITEMS')
-
     edit.prepare_after_prologue('toString')
     edit.add_invoke_entry('MenuTabId_onToString', 'p0', 'v0')
     edit.add_ret_if_result(True, 'result')
@@ -81,13 +79,26 @@ def main():
     #edit.add_ret_if_result(True)
     edit.save()
 
-    edit = edit_cls('MenuShowBtn')
+    edit = edit_cls('OldPlayerStatusBar_OpsButtonListener')
     edit.find_line(' const-class (v\d+), %s' % expr_type('$ItemsActivity'))
     edit.comment_line()
     edit.add_invoke_entry('MenuShowBtn_onClick')
     edit.add_line(' move-result-object %s' % edit.vars[0])
     edit.save()
 
+    edit = edit_cls('AvatarPlayerStatusBar_OpsButtonListener')
+    edit.find_line(' const-class (v\d+), %s' % expr_type('$ItemsActivity'))
+    edit.comment_line()
+    edit.add_invoke_entry('MenuShowBtn_onClick')
+    edit.add_line(' move-result-object %s' % edit.vars[0])
+    edit.save()
+    
+    edit = edit_cls('AvatarPlayerStatusBar_AvatarListener')
+    edit.prepare_after_prologue('clicked')
+    edit.add_invoke_entry('Mod_ShowAgentTab', '', 'v0')
+    edit.add_ret_if_result(False)
+    edit.save()
+    
     edit = edit_cls('AssetFinder')
     edit.find_line(r' const-string/jumbo v\d+, "\{"')
     edit.find_prologue(where="up")
@@ -119,7 +130,9 @@ def main():
 
     edit.prepare_after_prologue('onPlayerLocationChanged')
     edit.add_invoke_entry('PortalInfoDialog_onPlayerLocationChanged')
+    edit.save()
 
+    edit = edit_cls('PortalDialogMode')
     edit.find_line(r' const.*? ([pv]\d+), 0x3f40')
     edit.prepare_to_insert()
     edit.add_invoke_entry('PortalInfoDialog_getOpenDelay', edit.vars[0], edit.vars[0])
@@ -132,16 +145,6 @@ def main():
     edit.add_ret_if_result(False)
     edit.save()
 
-
-    edit = edit_cls('PlayerModelUtils')
-    edit.find_method_def('getDefaultResonatorToDeploy')
-    edit.find_line(' invoke-interface {(.+)}, Ljava/util/Map;->keySet\(\)Ljava/util/Set;', where='down')
-    edit.prepare_to_insert_before(True)
-    edit.add_invoke_entry('PlayerModelUtils_onGetDefaultResonatorToDeploy', edit.vars[0])
-    edit.add_line(' move-result-object %s' % edit.vars[0])
-    edit.save()
-
-
     edit = edit_cls('ZoomInMode')
     edit.find_method_def('onEnter')
     edit.find_line(r' iput-object [pv]\d+, p0, %s->h.+' % expr_type('$ZoomInMode'))
@@ -150,45 +153,8 @@ def main():
     edit.add_ret_if_result(False)
     edit.save()
 
-
-    edit = edit_cls('PortalUpgradeActivity')
-    edit.mod_field_def('portalEntity', 'public')
-    edit.save()
-
-
-    edit = edit_cls('PortalUpgradeUi')
-    edit.mod_class_def('public')
-    edit.mod_field_def('activity', 'public')
-
-    edit.find_line(r' const-string.*, "PORTAL"')
-    edit.find_line(r' invoke-virtual \{([pv]\d+), .*\}, Lcom/badlogic/gdx/scenes/scene2d/ui/Table;->add\(.*', where='down')
-    tableReg = edit.vars[0]
-    edit.find_line(r' invoke-virtual {.*, %s}, Lcom/badlogic/gdx/scenes/scene2d/ui/Table;->add\(.*' % tableReg, where='down')
-    edit.prepare_to_insert_before()
-    edit.add_invoke_entry('PortalUpgrade_onStatsTableCreated', 'p0, ' + tableReg)
-
-    edit.prepare_after_prologue('dispose')
-    edit.add_invoke_entry('PortalUpgrade_onDispose')
-    edit.save()
-
-
-    edit = edit_cls('ResonatorBrowser')
-    edit.find_line(r' add-int/lit8 ([pv]\d+), ([pv]\d+), 0x1e')
-    edit.comment_line()
-    edit.prepare_to_insert()
-    edit.add_invoke_entry('PortalUpgrade_getResonatorBrowserHeight', edit.vars[1], edit.vars[0])
-    edit.save()
-
-
-    edit = edit_cls('ClientFeatureKnobBundle')
-    edit.find_line(r' iget-boolean v0, p0, %s' % expr('$ClientFeatureKnobBundle->enableNewHackAnimations'))
-    edit.prepare_to_insert()
-    edit.add_invoke_entry('ClientFeatureKnobBundle_getEnableNewHackAnimations', 'v0', 'v0')
-
-    edit.find_line(r' iget-boolean v0, p0, %s' % expr('$ClientFeatureKnobBundle->enableNewDeployUi'))
-    edit.prepare_to_insert()
-    edit.add_invoke_entry('ClientFeatureKnobBundle_getEnableNewDeployUi', 'v0', 'v0')
-    edit.save()
+#    edit = edit_cls('ClientFeatureKnobBundle')
+#    edit.save()
 
     edit = edit_cls('HackController')
     edit.find_line(r' const-string/jumbo v1, " acquired"')
@@ -205,6 +171,22 @@ def main():
     edit.add_invoke_entry('HackAnimationStage_getTotalTime', edit.vars[0], edit.vars[0])
     edit.save()
 
+    #disable xm flow
+    edit = edit_cls('ParticleEnergyGlobVisuals')
+    edit.find_line(r' const-string/jumbo v0, "u_timeSec"')
+    edit.find_line(r' .*Lcom/badlogic/gdx/graphics/glutils/ShaderProgram;->setUniformf.*', where='down')
+    edit.prepare_to_insert_before()
+    edit.add_invoke_entry('ParticleEnergyGlobVisuals_getTimeSec', 'v1', 'v1')
+    edit.save()
+    
+    #disable shield animation
+    edit = edit_cls('ShieldShader')
+    edit.find_line(r' const-string/jumbo ([pv]\d+), "u_rampTargetInvWidth"')
+    edit.find_line(r' .*Lcom/badlogic/gdx/graphics/glutils/ShaderProgram;->setUniformf.*', where='down')
+    edit.prepare_to_insert_before()
+    edit.add_invoke_entry('ShieldShader_getRampTargetInvWidthX', 'v0', 'v0')
+    edit.add_invoke_entry('ShieldShader_getRampTargetInvWidthY', 'v4', 'v4')
+    edit.save()
 
     #stop inventory item rotation
     edit = edit_cls('InventoryItemRenderer')
@@ -223,6 +205,13 @@ def main():
     edit.prepare_to_insert()
     edit.add_line(' :skip_item_shader')
     edit.save()
+    
+    edit = edit_cls('PowerCubeDetailsUiCreator')
+    edit.find_method_def('addActionButtons')
+    edit.find_line(r' invoke-super .*', where='down')
+    edit.prepare_to_insert()
+    edit.add_invoke_entry('PowerCubeDetailsUiCreator_onActionButtonsTableCreated', 'p1')
+    edit.save()
 
     #modify shader code before compiling it
     edit = edit_cls('ShaderUtils')
@@ -237,7 +226,7 @@ def main():
 
     edit = edit_cls('CommsAdapter')
     edit.prepare_after_prologue('bindView')
-    edit.find_line(r' iget-object v3, p0, %s->l:%s' % (expr('$CommsAdapter'), expr('$SimpleDateFormat')))
+    edit.find_line(r' iget-object v3, p0, %s->m:%s' % (expr('$CommsAdapter'), expr('$SimpleDateFormat')))
     edit.comment_line()
     edit.add_invoke_entry('CommsAdapter_getDateFormat', '', 'v3')
     edit.save()
@@ -268,6 +257,13 @@ def main():
     edit.add_line(' :lbl_vibration_disabled')
     edit.save()
 
+    # change gps lock timeout
+    edit = edit_cls('GpsSensor')
+    edit.find_line(' .*Landroid/os/Handler;->postDelayed.*')
+    edit.prepare_to_insert_before()
+    edit.add_invoke_entry('GpsSensor_lockTimeout', ret='v2')
+    edit.save()
+
     #change order of buttons in round menu
     edit = edit_cls('ScannerTouchHandler')
     edit.find_line(' invoke-direct/range \{v0 \.\. v7\}, (.+)$')
@@ -281,6 +277,24 @@ def main():
     edit.add_line(' move-object v6, v11')
 
     edit.add_line(' :noswap')
+    edit.save()
+
+    #change format for AP and XM in COMM
+    edit = edit_cls('CommPlayerListener')
+    edit.find_line(r'(.+)%d XM(.+)$')
+    edit.replace_in_line('%d', '%,d')
+    edit.find_line(r'(.+)%d AP(.+)$')
+    edit.replace_in_line('%d', '%,d')
+    edit.save()
+
+    # privacy
+    edit = edit_cls('AvatarPlayerStatusBar')
+    edit.find_line(' invoke-interface {v0, v1}, Lcom/nianticproject/ingress/common/model/l;->a\(Ljava/lang/String;\)V')
+    edit.prepare_to_insert_before()
+    edit.add_invoke_entry('isPrivacyEnabled', ret='v5')
+    edit.add_line(' if-eqz v5, :lbl_privacy_disabled')
+    edit.add_line(' const-string/jumbo v1, ""')
+    edit.add_line(' :lbl_privacy_disabled')
     edit.save()
 
 if __name__ == '__main__':
