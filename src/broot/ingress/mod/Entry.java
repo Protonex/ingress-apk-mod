@@ -37,6 +37,7 @@ import com.nianticproject.ingress.common.app.NemesisWorld;
 import com.nianticproject.ingress.common.assets.AssetFinder;
 import com.nianticproject.ingress.common.inventory.MenuControllerImpl;
 import com.nianticproject.ingress.common.scanner.ScannerActivity;
+import com.nianticproject.ingress.common.scanner.ScannerStateManager;
 import com.nianticproject.ingress.common.ui.BaseSubActivity;
 import com.nianticproject.ingress.common.ui.FormatUtils;
 import com.nianticproject.ingress.common.ui.elements.PortalInfoDialog;
@@ -127,8 +128,8 @@ public class Entry {
 		Mod.menuController = menuController;
 	}
 
-	public static void MenuControllerImpl_onSelectTab(final MenuTabId tabId) {
-		ComponentManager.getSubActivityManager().replaceForegroundActivity(MenuUtils.getActivityClassForMenuTabId(tabId));
+	public static void MenuControllerImpl_onSelectTab(MenuControllerImpl controller, final MenuTabId tabId) {
+		controller.subActivityManager.replaceForegroundActivity(MenuUtils.getActivityClassForMenuTabId(tabId));
 	}
 
 	public static Class<?> MenuShowBtn_onClick() {
@@ -278,8 +279,12 @@ public class Entry {
 		t.row();
 	}
 
-	public static boolean ScannerStateManager_onTogglePortalVectors(boolean org) {
-		return Config.getBoolean(Pref.ShowPortalVectors) ? org : false;
+	public static void ScannerStateManager_onInit(ScannerStateManager instance) {
+		Mod.scannerStateManager = instance;
+	}
+
+	public static boolean ShouldShowPortalVectors() {
+		return Config.getBoolean(Pref.ShowPortalVectors);
 	}
 
 	public static boolean ScannerTouchHandler_shouldSwapTouchMenuButtons() {

@@ -62,7 +62,7 @@ def main():
     edit = edit_cls('MenuTabId')
     edit.add_enum('MOD_ABOUT')
     edit.add_enum('MOD_ITEMS')
-    edit.prepare_after_prologue('toString')
+    edit.prepare_after_prologue('getText2')
     edit.add_invoke_entry('MenuTabId_onToString', 'p0', 'v0')
     edit.add_ret_if_result(True, 'result')
     edit.save()
@@ -74,8 +74,9 @@ def main():
     edit.save()
 
     edit = edit_cls('MenuControllerImpl')
+    edit.mod_field_def('subActivityManager', 'public')
     edit.prepare_after_prologue('selectTab')
-    edit.add_invoke_entry('MenuControllerImpl_onSelectTab', 'p1')
+    edit.add_invoke_entry('MenuControllerImpl_onSelectTab', 'p0, p1')
     edit.add_line(' return-void')
     #edit.add_ret_if_result(True)
     edit.save()
@@ -139,13 +140,19 @@ def main():
     edit.add_invoke_entry('PortalInfoDialog_getOpenDelay', edit.vars[0], edit.vars[0])
     edit.save()
 
+    edit = edit_cls('NoPortalsScannerState')
+    edit.find_line(r' const/4 v1, 0x1');
+    edit.comment_line()
+    edit.add_invoke_entry('ShouldShowPortalVectors', '', 'v1')
+    edit.save()
 
     edit = edit_cls('ScannerStateManager')
-    edit.find_method_def('togglePortalVectors')
-    edit.find_line(r' if-eqz (v\d+), .+', where='down')
+    edit.find_line(r'.method public constructor \<init\>\(.*') # instance constructor
+    edit.find_line(r' return-void', where='down')
     edit.prepare_to_insert_before()
-    edit.add_invoke_entry('ScannerStateManager_onTogglePortalVectors', edit.vars[0], edit.vars[0])
-#    edit.add_ret_if_result(False)
+    edit.add_invoke_entry('ScannerStateManager_onInit', 'p0')
+
+    edit.mod_method_def('togglePortalVectors', 'public')
     edit.save()
 
     edit = edit_cls('ZoomInMode')
@@ -298,7 +305,7 @@ def main():
 
     # privacy
     edit = edit_cls('AvatarPlayerStatusBar')
-    edit.find_line(' invoke-interface {v0, v1}, Lcom/nianticproject/ingress/common/model/k;->a\(Ljava/lang/String;\)V')
+    edit.find_line(' invoke-interface {v0, v1}, %s->a\(Ljava/lang/String;\)V' % expr('$PlayerListener'))
     edit.prepare_to_insert_before()
     edit.add_invoke_entry('isPrivacyEnabled', ret='v5')
     edit.add_line(' if-eqz v5, :lbl_privacy_disabled')
